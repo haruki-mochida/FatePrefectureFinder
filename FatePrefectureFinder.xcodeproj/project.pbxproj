@@ -11,6 +11,7 @@
 		0F01C0412B2B2DCA00B20178 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F01C0402B2B2DCA00B20178 /* ContentView.swift */; };
 		0F01C0432B2B2DCD00B20178 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0F01C0422B2B2DCD00B20178 /* Assets.xcassets */; };
 		0F01C0462B2B2DCD00B20178 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0F01C0452B2B2DCD00B20178 /* Preview Assets.xcassets */; };
+		0F5F5DEA2B4BCCF50035E5FB /*  PrefectureModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5F5DE92B4BCCF50035E5FB /*  PrefectureModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +20,7 @@
 		0F01C0402B2B2DCA00B20178 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		0F01C0422B2B2DCD00B20178 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0F01C0452B2B2DCD00B20178 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		0F5F5DE92B4BCCF50035E5FB /*  PrefectureModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = " PrefectureModel.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +55,7 @@
 			children = (
 				0F01C03E2B2B2DCA00B20178 /* FatePrefectureFinderApp.swift */,
 				0F01C0402B2B2DCA00B20178 /* ContentView.swift */,
+				0F5F5DE92B4BCCF50035E5FB /*  PrefectureModel.swift */,
 				0F01C0422B2B2DCD00B20178 /* Assets.xcassets */,
 				0F01C0442B2B2DCD00B20178 /* Preview Content */,
 			);
@@ -137,6 +140,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0F5F5DEA2B4BCCF50035E5FB /*  PrefectureModel.swift in Sources */,
 				0F01C0412B2B2DCA00B20178 /* ContentView.swift in Sources */,
 				0F01C03F2B2B2DCA00B20178 /* FatePrefectureFinderApp.swift in Sources */,
 			);

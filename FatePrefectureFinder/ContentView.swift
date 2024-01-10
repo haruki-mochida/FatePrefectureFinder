@@ -91,21 +91,28 @@ struct InputView: View {
     @State private var today: Date = Date()
     var startLoading: (String, YearMonthDay, String, YearMonthDay) -> Void
 
-
     var body: some View {
         Form {
-            TextField("名前", text: $username)
-            DatePicker("生年月日", selection: $birthday, displayedComponents: .date)
-            Picker("血液型", selection: $bloodType) {
-                ForEach(["A", "B", "AB", "O"], id: \.self) {
-                    Text($0)
+            Section {
+                TextField("名前", text: $username)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                DatePicker("生年月日", selection: $birthday, displayedComponents: .date)
+                Picker("血液型", selection: $bloodType) {
+                    ForEach(["A", "B", "AB", "O"], id: \.self) {
+                        Text($0)
+                    }
                 }
+                .pickerStyle(SegmentedPickerStyle())
+                DatePicker("今日の日付", selection: $today, displayedComponents: .date)
             }
-            DatePicker("今日の日付", selection: $today, displayedComponents: .date)
-            Button("占う") {
-                let birthdayData = convertDateToYearMonthDay(birthday)
-                let todayData = convertDateToYearMonthDay(today)
-                startLoading(username, birthdayData, bloodType, todayData)
+
+            Section {
+                Button("占う") {
+                    let birthdayData = convertDateToYearMonthDay(birthday)
+                    let todayData = convertDateToYearMonthDay(today)
+                    startLoading(username, birthdayData, bloodType, todayData)
+                }
+                .buttonStyle(PrimaryButtonStyle())
             }
         }
     }

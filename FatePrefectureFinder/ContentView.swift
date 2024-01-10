@@ -10,19 +10,47 @@ import Kingfisher
 
 struct ContentView: View {
     @State private var currentView: ViewType = .home
+    @State private var prefectureData: Prefecture?
+    @State private var isLoading = false
+    @State private var showError = false
 
     var body: some View {
         switch currentView {
         case .home:
             HomeView(currentView: $currentView)
         case .input:
-            InputView(currentView: $currentView)
+            InputView(currentView: $currentView, startLoading: fetchPrefectureData)
         case .loading:
             LoadingView()
         case .result:
-            ResultView(currentView: $currentView)
+            ResultView(currentView: $currentView, prefectureData: prefectureData)
         case .error:
             ErrorView(currentView: $currentView)
+        }
+    }
+
+    // APIから都道府県のデータを取得する関数
+    func fetchPrefectureData(name: String, birthday: YearMonthDay, bloodType: String, today: YearMonthDay) {
+        isLoading = true  // ローディング状態を開始
+        showError = false // エラー表示をリセット
+        currentView = .loading // ローディング画面に遷移
+
+        // APIリクエスト用のデータを作成
+        let requestData = RequestData(name: name, birthday: birthday, bloodType: bloodType, today: today)
+
+        // API通信を実行
+        PrefectureService().fetchPrefecture(requestData: requestData) { result in
+            DispatchQueue.main.async { // メインスレッドでUIの更新を行う
+                isLoading = false // ローディング状態を終了
+                switch result {
+                case .success(let data):
+                    self.prefectureData = data // データを保存
+                    self.currentView = .result // 結果画面に遷移
+                case .failure:
+                    self.showError = true  // エラーフラグを設定
+                    self.currentView = .error // エラー画面に遷移
+                }
+            }
         }
     }
 
@@ -57,11 +85,12 @@ struct HomeView: View {
 
 struct InputView: View {
     @Binding var currentView: ContentView.ViewType
-    // 入力フォームの状態変数（例）
     @State private var username: String = ""
     @State private var birthday: Date = Date()
     @State private var bloodType: String = "A"
     @State private var today: Date = Date()
+    var startLoading: (String, YearMonthDay, String, YearMonthDay) -> Void
+
 
     var body: some View {
         Form {
@@ -74,9 +103,19 @@ struct InputView: View {
             }
             DatePicker("今日の日付", selection: $today, displayedComponents: .date)
             Button("占う") {
-                currentView = .loading
+                let birthdayData = convertDateToYearMonthDay(birthday)
+                let todayData = convertDateToYearMonthDay(today)
+                startLoading(username, birthdayData, bloodType, todayData)
             }
         }
+    }
+
+    private func convertDateToYearMonthDay(_ date: Date) -> YearMonthDay {
+        let calendar = Calendar.current
+        let year = calendar.component(.year, from: date)
+        let month = calendar.component(.month, from: date)
+        let day = calendar.component(.day, from: date)
+        return YearMonthDay(year: year, month: month, day: day)
     }
 }
 
@@ -92,45 +131,34 @@ struct LoadingView: View {
 
 struct ResultView: View {
     @Binding var currentView: ContentView.ViewType
-    
-    // APIから受け取るデータを表す状態変数
-    @State private var prefectureName: String = "富山県"
-    @State private var capital: String = "富山市"
-    @State private var citizenDay: MonthDay? = MonthDay(month: 5, day: 9)
-    @State private var hasCoastLine: Bool = true
-    @State private var logoUrl: String = "https://japan-map.com/wp-content/uploads/toyama.png"
-    @State private var brief: String = "富山県（とやまけん）は、日本の中部地方に位置する県。県庁所在地は富山市。\n中部地方の日本海側、新潟県を含めた場合の北陸地方のほぼ中央にある。\n※出典: フリー百科事典『ウィキペディア（Wikipedia）』"
+    var prefectureData: Prefecture?
 
     var body: some View {
         VStack {
-            Text("結果")
-                .font(.title)
-            
-            // 都道府県名の表示
-            Text(prefectureName)
-                .font(.headline)
-            
-            // 県庁所在地の表示
-            Text("県庁所在地: \(capital)")
-            
-            // 県民の日（あれば）の表示
-            if let day = citizenDay {
-                Text("県民の日: \(day.month)月\(day.day)日")
+            if let data = prefectureData {
+                Text("結果")
+                    .font(.title)
+
+                Text(data.name)
+                    .font(.headline)
+
+                Text("県庁所在地: \(data.capital)")
+
+                if let day = data.citizenDay {
+                    Text("県民の日: \(day.month)月\(day.day)日")
+                }
+
+                Text("海岸線: \(data.hasCoastLine ? "あり" : "なし")")
+
+                Text(data.brief)
+                    .padding()
+
+                KFImage(URL(string: data.logoUrl))
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 100, height: 100)
             }
-            
-            // 海岸線の有無の表示
-            Text("海岸線: \(hasCoastLine ? "あり" : "なし")")
-            
-            // 都道府県の概要の表示
-            Text(brief)
-                .padding()
-            
-            // Kingfisherを使用してロゴ画像を表示
-            KFImage(URL(string: logoUrl))
-                .resizable()
-                .scaledToFit()
-                .frame(width: 100, height: 100)
-            
+
             Button("もう一度占う") {
                 currentView = .input
             }

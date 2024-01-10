@@ -90,6 +90,8 @@ struct InputView: View {
     @State private var birthday: Date = Date()
     @State private var bloodType: String = "A"
     @State private var today: Date = Date()
+    var startLoading: (String, YearMonthDay, String, YearMonthDay) -> Void
+
 
     var body: some View {
         Form {
@@ -102,10 +104,20 @@ struct InputView: View {
             }
             DatePicker("今日の日付", selection: $today, displayedComponents: .date)
             Button("占う") {
-                currentView = .loading
+                let birthdayData = convertDateToYearMonthDay(birthday)
+                let todayData = convertDateToYearMonthDay(today)
+                startLoading(username, birthdayData, bloodType, todayData)
             }
         }
     }
+    private func convertDateToYearMonthDay(_ date: Date) -> YearMonthDay {
+        let calendar = Calendar.current
+        let year = calendar.component(.year, from: date)
+        let month = calendar.component(.month, from: date)
+        let day = calendar.component(.day, from: date)
+        return YearMonthDay(year: year, month: month, day: day)
+    }
+
 }
 
 struct LoadingView: View {

@@ -125,13 +125,25 @@ struct InputView: View {
 struct LoadingView: View {
     var body: some View {
         VStack {
-            ProgressView()
-                .progressViewStyle(CircularProgressViewStyle(tint: .blue))
-                .scaleEffect(1.5)
-                .padding()
-            Text("結果を取得中です。しばらくお待ちください。")
-                .padding()
+            CustomProgressView()
+            Text("結果を取得中です。しばらくお待ちください。").padding()
         }
+    }
+}
+
+struct CustomProgressView: View {
+    @State private var isAnimating = false
+
+    var body: some View {
+        Circle()
+            .trim(from: 0, to: 0.8)
+            .stroke(AngularGradient(gradient: .init(colors: [.blue, .purple]), center: .center), style: StrokeStyle(lineWidth: 8, lineCap: .round))
+            .frame(width: 50, height: 50)
+            .rotationEffect(Angle(degrees: isAnimating ? 360 : 0))
+            .animation(Animation.linear(duration: 1).repeatForever(autoreverses: false), value: isAnimating)
+            .onAppear() {
+                self.isAnimating = true
+            }
     }
 }
 

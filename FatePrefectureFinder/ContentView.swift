@@ -148,35 +148,48 @@ struct ResultView: View {
             if let data = prefectureData {
                 Text("結果")
                     .font(.title)
-
-                Text(data.name)
-                    .font(.headline)
-
-                Text("県庁所在地: \(data.capital)")
-
-                if let day = data.citizenDay {
-                    Text("県民の日: \(day.month)月\(day.day)日")
-                }
-
-                Text("海岸線: \(data.hasCoastLine ? "あり" : "なし")")
-
-                Text(data.brief)
                     .padding()
 
-                KFImage(URL(string: data.logoUrl))
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 100, height: 100)
-            }
+                CardView {
+                    VStack(alignment: .leading) {
+                        Text(data.name)
+                            .font(.headline)
+                        Text("県庁所在地: \(data.capital)")
+                        if let day = data.citizenDay {
+                            Text("県民の日: \(day.month)月\(day.day)日")
+                        }
+                        Text("海岸線: \(data.hasCoastLine ? "あり" : "なし")")
+                        Text(data.brief)
+                        KFImage(URL(string: data.logoUrl))
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 100)
+                    }
+                    .padding()
+                }
 
-            Button("もう一度占う") {
-                currentView = .input
+                Button("もう一度占う") {
+                    currentView = .input
+                }
+                .buttonStyle(PrimaryButtonStyle())
             }
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
         }
+    }
+}
+
+struct CardView<Content: View>: View {
+    let content: Content
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        content
+            .padding()
+            .background(Color.white)
+            .cornerRadius(10)
+            .shadow(radius: 5)
+            .padding()
     }
 }
 

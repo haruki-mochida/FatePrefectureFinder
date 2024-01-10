@@ -91,7 +91,7 @@ struct InputView: View {
 
     var body: some View {
         Form {
-            Section {
+            Section(header: Text("プロフィール情報を入力").font(.headline)) {
                 TextField("名前", text: $username)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                 DatePicker("生年月日", selection: $birthday, displayedComponents: .date)
@@ -104,13 +104,12 @@ struct InputView: View {
                 DatePicker("今日の日付", selection: $today, displayedComponents: .date)
             }
 
-            Section {
-                Button("占う") {
-                    let birthdayData = convertDateToYearMonthDay(birthday)
-                    let todayData = convertDateToYearMonthDay(today)
-                    startLoading(username, birthdayData, bloodType, todayData)
-                }
-                .buttonStyle(PrimaryButtonStyle())
+            Button("占う") {
+                let birthdayData = convertDateToYearMonthDay(birthday)
+                let todayData = convertDateToYearMonthDay(today)
+                startLoading(username, birthdayData, bloodType, todayData)
+            }
+            .buttonStyle(PrimaryButtonStyle())
             }
         }
     }

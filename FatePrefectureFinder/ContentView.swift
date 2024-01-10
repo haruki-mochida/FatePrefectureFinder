@@ -31,21 +31,24 @@ struct ContentView: View {
 
     // APIから都道府県のデータを取得する関数
     func fetchPrefectureData(name: String, birthday: YearMonthDay, bloodType: String, today: YearMonthDay) {
-        isLoading = true
-        showError = false
-        currentView = .loading
+        isLoading = true  // ローディング状態を開始
+        showError = false // エラー表示をリセット
+        currentView = .loading // ローディング画面に遷移
 
+        // APIリクエスト用のデータを作成
         let requestData = RequestData(name: name, birthday: birthday, bloodType: bloodType, today: today)
+
+        // API通信を実行
         PrefectureService().fetchPrefecture(requestData: requestData) { result in
-            DispatchQueue.main.async {
-                isLoading = false
+            DispatchQueue.main.async { // メインスレッドでUIの更新を行う
+                isLoading = false // ローディング状態を終了
                 switch result {
                 case .success(let data):
-                    self.prefectureData = data
-                    self.currentView = .result
+                    self.prefectureData = data // データを保存
+                    self.currentView = .result // 結果画面に遷移
                 case .failure:
-                    self.showError = true
-                    self.currentView = .error
+                    self.showError = true  // エラーフラグを設定
+                    self.currentView = .error // エラー画面に遷移
                 }
             }
         }

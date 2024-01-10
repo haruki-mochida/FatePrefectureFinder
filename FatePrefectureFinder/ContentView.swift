@@ -202,10 +202,19 @@ struct ErrorView: View {
 
     var body: some View {
         VStack {
+            Image(systemName: "exclamationmark.triangle")
+                .foregroundColor(.red)
+                .font(.largeTitle)
+                .padding()
             Text("エラーが発生しました")
+                .font(.title)
+                .padding()
+            Text("何か問題が発生したようです。もう一度試してください。")
+                .padding()
             Button("再試行") {
                 currentView = .home
             }
+            .buttonStyle(PrimaryButtonStyle())
         }
     }
 }

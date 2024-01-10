@@ -72,14 +72,18 @@ struct HomeView: View {
                 .font(.headline)
                 .padding()
 
-            Button("占いを始める") {
-                currentView = .input
+            Button(action: { currentView = .input }) {
+                Text("占いを始める")
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .leading, endPoint: .trailing))
+                    .cornerRadius(10)
+                    .shadow(radius: 5)
             }
-            .foregroundColor(.white)
             .padding()
-            .background(Color.blue)
-            .cornerRadius(10)
         }
+        .padding()
     }
 }
 

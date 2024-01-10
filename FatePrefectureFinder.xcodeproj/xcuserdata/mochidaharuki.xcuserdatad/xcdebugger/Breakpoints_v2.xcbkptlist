@@ -14,10 +14,10 @@
             filePath = "FatePrefectureFinder/ContentView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "86"
-            endingLineNumber = "86"
-            landmarkName = "InputView"
-            landmarkType = "14">
+            startingLineNumber = "90"
+            endingLineNumber = "90"
+            landmarkName = "bloodType"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

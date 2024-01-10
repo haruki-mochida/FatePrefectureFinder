@@ -10,19 +10,44 @@ import Kingfisher
 
 struct ContentView: View {
     @State private var currentView: ViewType = .home
+    @State private var prefectureData: Prefecture?
+    @State private var isLoading = false
+    @State private var showError = false
 
     var body: some View {
         switch currentView {
         case .home:
             HomeView(currentView: $currentView)
         case .input:
-            InputView(currentView: $currentView)
+            InputView(currentView: $currentView, startLoading: fetchPrefectureData)
         case .loading:
             LoadingView()
         case .result:
-            ResultView(currentView: $currentView)
+            ResultView(currentView: $currentView, prefectureData: prefectureData)
         case .error:
             ErrorView(currentView: $currentView)
+        }
+    }
+
+    // APIから都道府県のデータを取得する関数
+    func fetchPrefectureData(name: String, birthday: YearMonthDay, bloodType: String, today: YearMonthDay) {
+        isLoading = true
+        showError = false
+        currentView = .loading
+
+        let requestData = RequestData(name: name, birthday: birthday, bloodType: bloodType, today: today)
+        PrefectureService().fetchPrefecture(requestData: requestData) { result in
+            DispatchQueue.main.async {
+                isLoading = false
+                switch result {
+                case .success(let data):
+                    self.prefectureData = data
+                    self.currentView = .result
+                case .failure:
+                    self.showError = true
+                    self.currentView = .error
+                }
+            }
         }
     }
 
@@ -92,7 +117,7 @@ struct LoadingView: View {
 
 struct ResultView: View {
     @Binding var currentView: ContentView.ViewType
-    
+
     // APIから受け取るデータを表す状態変数
     @State private var prefectureName: String = "富山県"
     @State private var capital: String = "富山市"
@@ -105,32 +130,32 @@ struct ResultView: View {
         VStack {
             Text("結果")
                 .font(.title)
-            
+
             // 都道府県名の表示
             Text(prefectureName)
                 .font(.headline)
-            
+
             // 県庁所在地の表示
             Text("県庁所在地: \(capital)")
-            
+
             // 県民の日（あれば）の表示
             if let day = citizenDay {
                 Text("県民の日: \(day.month)月\(day.day)日")
             }
-            
+
             // 海岸線の有無の表示
             Text("海岸線: \(hasCoastLine ? "あり" : "なし")")
-            
+
             // 都道府県の概要の表示
             Text(brief)
                 .padding()
-            
+
             // Kingfisherを使用してロゴ画像を表示
             KFImage(URL(string: logoUrl))
                 .resizable()
                 .scaledToFit()
                 .frame(width: 100, height: 100)
-            
+
             Button("もう一度占う") {
                 currentView = .input
             }

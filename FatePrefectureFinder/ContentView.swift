@@ -129,9 +129,12 @@ struct InputView: View {
 struct LoadingView: View {
     var body: some View {
         VStack {
-            ProgressView("占い中...")
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                .scaleEffect(1.5)
                 .padding()
             Text("結果を取得中です。しばらくお待ちください。")
+                .padding()
         }
     }
 }

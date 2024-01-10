@@ -142,34 +142,37 @@ struct ResultView: View {
     var body: some View {
         VStack {
             if let data = prefectureData {
-                Text("結果")
-                    .font(.title)
-                    .padding()
-
-                CardView {
-                    VStack(alignment: .leading) {
-                        Text(data.name)
-                            .font(.headline)
-                        Text("県庁所在地: \(data.capital)")
-                        if let day = data.citizenDay {
-                            Text("県民の日: \(day.month)月\(day.day)日")
-                        }
-                        Text("海岸線: \(data.hasCoastLine ? "あり" : "なし")")
-                        Text(data.brief)
-                        KFImage(URL(string: data.logoUrl))
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 100)
-                    }
-                    .padding()
-                }
-
+                Text("結果").font(.title).padding()
+                ResultCardView(prefectureData: data)
                 Button("もう一度占う") {
                     currentView = .input
                 }
                 .buttonStyle(PrimaryButtonStyle())
             }
         }
+    }
+}
+
+struct ResultCardView: View {
+    var prefectureData: Prefecture
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(prefectureData.name).font(.headline)
+            Text("県庁所在地: \(prefectureData.capital)")
+            if let day = prefectureData.citizenDay {
+                Text("県民の日: \(day.month)月\(day.day)日")
+            }
+            Text("海岸線: \(prefectureData.hasCoastLine ? "あり" : "なし")")
+            Text(prefectureData.brief).padding()
+            KFImage(URL(string: prefectureData.logoUrl))
+                .resizable().scaledToFit().frame(width: 100, height: 100)
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(10)
+        .shadow(radius: 5)
+        .padding()
     }
 }
 

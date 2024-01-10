@@ -37,8 +37,20 @@ class PrefectureService {
 struct RequestData: Codable {
     let name: String
     let birthday: YearMonthDay
-    let bloodType: String
+    var bloodType: String
     let today: YearMonthDay
+
+    enum CodingKeys: String, CodingKey {
+        case name, birthday, today
+        case bloodType = "blood_type"
+    }
+
+    init(name: String, birthday: YearMonthDay, bloodType: String, today: YearMonthDay) {
+        self.name = name
+        self.birthday = birthday
+        self.bloodType = bloodType.lowercased() // ここで小文字に変換
+        self.today = today
+    }
 }
 
 // 年月日を表すデータモデル

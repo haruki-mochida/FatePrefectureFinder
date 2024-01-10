@@ -74,14 +74,8 @@ struct HomeView: View {
 
             Button(action: { currentView = .input }) {
                 Text("占いを始める")
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .leading, endPoint: .trailing))
-                    .cornerRadius(10)
-                    .shadow(radius: 5)
             }
-            .padding()
+            .buttonStyle(PressableButtonStyle())
         }
         .padding()
     }
@@ -230,6 +224,18 @@ struct PrimaryButtonStyle: ButtonStyle {
     }
 }
 
+struct PressableButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundColor(.white)
+            .padding()
+            .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .leading, endPoint: .trailing))
+            .cornerRadius(10)
+            .shadow(radius: 5)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0), value: configuration.isPressed)
+    }
+}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

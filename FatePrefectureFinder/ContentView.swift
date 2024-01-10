@@ -85,7 +85,6 @@ struct HomeView: View {
 
 struct InputView: View {
     @Binding var currentView: ContentView.ViewType
-    // 入力フォームの状態変数（例）
     @State private var username: String = ""
     @State private var birthday: Date = Date()
     @State private var bloodType: String = "A"
@@ -110,6 +109,7 @@ struct InputView: View {
             }
         }
     }
+
     private func convertDateToYearMonthDay(_ date: Date) -> YearMonthDay {
         let calendar = Calendar.current
         let year = calendar.component(.year, from: date)
@@ -117,7 +117,6 @@ struct InputView: View {
         let day = calendar.component(.day, from: date)
         return YearMonthDay(year: year, month: month, day: day)
     }
-
 }
 
 struct LoadingView: View {

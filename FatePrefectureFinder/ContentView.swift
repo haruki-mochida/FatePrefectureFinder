@@ -110,7 +110,6 @@ struct InputView: View {
                 startLoading(username, birthdayData, bloodType, todayData)
             }
             .buttonStyle(PrimaryButtonStyle())
-            }
         }
     }
 

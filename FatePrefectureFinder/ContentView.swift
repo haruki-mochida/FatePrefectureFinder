@@ -72,14 +72,12 @@ struct HomeView: View {
                 .font(.headline)
                 .padding()
 
-            Button("占いを始める") {
-                currentView = .input
+            Button(action: { currentView = .input }) {
+                Text("占いを始める")
             }
-            .foregroundColor(.white)
-            .padding()
-            .background(Color.blue)
-            .cornerRadius(10)
+            .buttonStyle(PressableButtonStyle())
         }
+        .padding()
     }
 }
 
@@ -91,22 +89,27 @@ struct InputView: View {
     @State private var today: Date = Date()
     var startLoading: (String, YearMonthDay, String, YearMonthDay) -> Void
 
-
     var body: some View {
         Form {
-            TextField("名前", text: $username)
-            DatePicker("生年月日", selection: $birthday, displayedComponents: .date)
-            Picker("血液型", selection: $bloodType) {
-                ForEach(["A", "B", "AB", "O"], id: \.self) {
-                    Text($0)
+            Section(header: Text("プロフィール情報を入力").font(.headline)) {
+                TextField("名前", text: $username)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                DatePicker("生年月日", selection: $birthday, displayedComponents: .date)
+                Picker("血液型", selection: $bloodType) {
+                    ForEach(["A", "B", "AB", "O"], id: \.self) {
+                        Text($0)
+                    }
                 }
+                .pickerStyle(SegmentedPickerStyle())
+                DatePicker("今日の日付", selection: $today, displayedComponents: .date)
             }
-            DatePicker("今日の日付", selection: $today, displayedComponents: .date)
+
             Button("占う") {
                 let birthdayData = convertDateToYearMonthDay(birthday)
                 let todayData = convertDateToYearMonthDay(today)
                 startLoading(username, birthdayData, bloodType, todayData)
             }
+            .buttonStyle(PrimaryButtonStyle())
         }
     }
 
@@ -122,10 +125,25 @@ struct InputView: View {
 struct LoadingView: View {
     var body: some View {
         VStack {
-            ProgressView("占い中...")
-                .padding()
-            Text("結果を取得中です。しばらくお待ちください。")
+            CustomProgressView()
+            Text("結果を取得中です。しばらくお待ちください。").padding()
         }
+    }
+}
+
+struct CustomProgressView: View {
+    @State private var isAnimating = false
+
+    var body: some View {
+        Circle()
+            .trim(from: 0, to: 0.8)
+            .stroke(AngularGradient(gradient: .init(colors: [.blue, .purple]), center: .center), style: StrokeStyle(lineWidth: 8, lineCap: .round))
+            .frame(width: 50, height: 50)
+            .rotationEffect(Angle(degrees: isAnimating ? 360 : 0))
+            .animation(Animation.linear(duration: 1).repeatForever(autoreverses: false), value: isAnimating)
+            .onAppear() {
+                self.isAnimating = true
+            }
     }
 }
 
@@ -136,37 +154,53 @@ struct ResultView: View {
     var body: some View {
         VStack {
             if let data = prefectureData {
-                Text("結果")
-                    .font(.title)
-
-                Text(data.name)
-                    .font(.headline)
-
-                Text("県庁所在地: \(data.capital)")
-
-                if let day = data.citizenDay {
-                    Text("県民の日: \(day.month)月\(day.day)日")
+                Text("結果").font(.title).padding()
+                ResultCardView(prefectureData: data)
+                Button("もう一度占う") {
+                    currentView = .input
                 }
-
-                Text("海岸線: \(data.hasCoastLine ? "あり" : "なし")")
-
-                Text(data.brief)
-                    .padding()
-
-                KFImage(URL(string: data.logoUrl))
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 100, height: 100)
+                .buttonStyle(PrimaryButtonStyle())
             }
-
-            Button("もう一度占う") {
-                currentView = .input
-            }
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
         }
+    }
+}
+
+struct ResultCardView: View {
+    var prefectureData: Prefecture
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(prefectureData.name).font(.headline)
+            Text("県庁所在地: \(prefectureData.capital)")
+            if let day = prefectureData.citizenDay {
+                Text("県民の日: \(day.month)月\(day.day)日")
+            }
+            Text("海岸線: \(prefectureData.hasCoastLine ? "あり" : "なし")")
+            Text(prefectureData.brief).padding()
+            KFImage(URL(string: prefectureData.logoUrl))
+                .resizable().scaledToFit().frame(width: 100, height: 100)
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(10)
+        .shadow(radius: 5)
+        .padding()
+    }
+}
+
+struct CardView<Content: View>: View {
+    let content: Content
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        content
+            .padding()
+            .background(Color.white)
+            .cornerRadius(10)
+            .shadow(radius: 5)
+            .padding()
     }
 }
 
@@ -175,11 +209,44 @@ struct ErrorView: View {
 
     var body: some View {
         VStack {
+            Image(systemName: "exclamationmark.triangle")
+                .foregroundColor(.red)
+                .font(.largeTitle)
+                .padding()
             Text("エラーが発生しました")
+                .font(.title)
+                .padding()
+            Text("何か問題が発生したようです。もう一度試してください。")
+                .padding()
             Button("再試行") {
                 currentView = .home
             }
+            .buttonStyle(PrimaryButtonStyle())
         }
+    }
+}
+
+struct PrimaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Self.Configuration) -> some View {
+        configuration.label
+            .foregroundColor(.white)
+            .padding()
+            .background(Color.blue)
+            .cornerRadius(10)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1)
+    }
+}
+
+struct PressableButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundColor(.white)
+            .padding()
+            .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .leading, endPoint: .trailing))
+            .cornerRadius(10)
+            .shadow(radius: 5)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0), value: configuration.isPressed)
     }
 }
 

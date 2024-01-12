@@ -92,8 +92,21 @@ struct InputView: View {
     var body: some View {
         Form {
             Section(header: Text("プロフィール情報を入力").font(.headline)) {
-                TextField("名前", text: $username)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                ZStack(alignment: .leading) {
+                    if username.isEmpty {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.red.opacity(0.2)) // Light red fill for empty TextField
+                            .frame(height: 36)
+                    }
+                    TextField("名前", text: $username)
+                        .padding(.horizontal, 4)
+                }
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(username.isEmpty ? Color.red : Color.gray, lineWidth: 1) // Softer border color
+                )
+                .padding(.vertical, 4)
+
                 DatePicker("生年月日", selection: $birthday, displayedComponents: .date)
                 Picker("血液型", selection: $bloodType) {
                     ForEach(["A", "B", "AB", "O"], id: \.self) {
@@ -109,7 +122,9 @@ struct InputView: View {
                 let todayData = convertDateToYearMonthDay(today)
                 startLoading(username, birthdayData, bloodType, todayData)
             }
-            .buttonStyle(PrimaryButtonStyle())
+            .buttonStyle(PrimaryButtonStyle(disabled: username.isEmpty))
+            .disabled(username.isEmpty)
+            .opacity(username.isEmpty ? 0.5 : 1)
         }
     }
 
@@ -227,11 +242,13 @@ struct ErrorView: View {
 }
 
 struct PrimaryButtonStyle: ButtonStyle {
-    func makeBody(configuration: Self.Configuration) -> some View {
+    var disabled: Bool = false  // Make the disabled parameter optional with a default value
+
+    func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .foregroundColor(.white)
             .padding()
-            .background(Color.blue)
+            .background(disabled ? Color.gray : Color.blue)  // Use the disabled state
             .cornerRadius(10)
             .scaleEffect(configuration.isPressed ? 0.95 : 1)
     }

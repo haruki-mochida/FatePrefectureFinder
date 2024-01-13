@@ -23,7 +23,7 @@ struct ContentView: View {
         case .loading:
             LoadingView()
         case .result:
-            ResultView(currentView: $currentView, prefectureData: prefectureData)
+            ResultView(currentView: $currentView, prefectureData: prefectureData, parent: self)
         case .error:
             ErrorView(currentView: $currentView)
         }
@@ -45,7 +45,7 @@ struct ContentView: View {
                 switch result {
                 case .success(let data):
                     self.prefectureData = data // データを保存
-                    saveResultToUserDefaults(data)
+                    self.saveResultToUserDefaults(prefectureData: data) // 関数をインスタンスメソッドとして呼び出す
                     self.currentView = .result // 結果画面に遷移
                 case .failure:
                     self.showError = true  // エラーフラグを設定
@@ -54,12 +54,13 @@ struct ContentView: View {
             }
         }
     }
-    
-    private func saveResultToUserDefaults(_ data: Prefecture) {
-        // Convert Prefecture data to Data
-        if let encodedData = try? JSONEncoder().encode(data) {
-            // Save data to UserDefaults
-            UserDefaults.standard.set(encodedData, forKey: "savedResult")
+
+    func saveResultToUserDefaults(prefectureData: Prefecture) {
+        //Prefectureのようなカスタム型のデータを保存するために、Data型に変換（エンコード）
+        let encoder = JSONEncoder()
+        if let encodedData = try? encoder.encode(prefectureData) {
+            //UserDefaultsにデータを追加
+            UserDefaults.standard.set(encodedData, forKey: "savedResults")
         }
     }
 

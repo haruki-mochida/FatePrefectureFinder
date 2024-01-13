@@ -175,6 +175,7 @@ struct CustomProgressView: View {
 struct ResultView: View {
     @Binding var currentView: ContentView.ViewType
     var prefectureData: Prefecture?
+    var parent: ContentView
 
     var body: some View {
         VStack {
@@ -185,6 +186,14 @@ struct ResultView: View {
                     currentView = .input
                 }
                 .buttonStyle(PrimaryButtonStyle())
+
+                Button("結果を保存") {
+                    if let data = prefectureData {
+                        parent.saveResultToUserDefaults(prefectureData: data)
+                    }
+                }
+                .buttonStyle(PrimaryButtonStyle())
+                .disabled(prefectureData == nil)
             }
         }
     }

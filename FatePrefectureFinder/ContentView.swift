@@ -45,12 +45,21 @@ struct ContentView: View {
                 switch result {
                 case .success(let data):
                     self.prefectureData = data // データを保存
+                    saveResultToUserDefaults(data)
                     self.currentView = .result // 結果画面に遷移
                 case .failure:
                     self.showError = true  // エラーフラグを設定
                     self.currentView = .error // エラー画面に遷移
                 }
             }
+        }
+    }
+    
+    private func saveResultToUserDefaults(_ data: Prefecture) {
+        // Convert Prefecture data to Data
+        if let encodedData = try? JSONEncoder().encode(data) {
+            // Save data to UserDefaults
+            UserDefaults.standard.set(encodedData, forKey: "savedResult")
         }
     }
 

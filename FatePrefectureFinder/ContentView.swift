@@ -17,7 +17,7 @@ struct ContentView: View {
     var body: some View {
         switch currentView {
         case .home:
-            HomeView(currentView: $currentView)
+            HomeView(currentView: $currentView, loadSavedResults: loadSavedResults)
         case .input:
             InputView(currentView: $currentView, startLoading: fetchPrefectureData)
         case .loading:
@@ -56,12 +56,27 @@ struct ContentView: View {
     }
 
     func saveResultToUserDefaults(prefectureData: Prefecture) {
-        //Prefectureのようなカスタム型のデータを保存するために、Data型に変換（エンコード）
         let encoder = JSONEncoder()
-        if let encodedData = try? encoder.encode(prefectureData) {
-            //UserDefaultsにデータを追加
+        var savedResults: [Prefecture] = loadSavedResults()
+        savedResults.append(prefectureData)
+
+        if let encodedData = try? encoder.encode(savedResults) {
             UserDefaults.standard.set(encodedData, forKey: "savedResults")
         }
+    }
+    
+    private func loadSavedResults() -> [Prefecture] {
+        if let savedData = UserDefaults.standard.data(forKey: "savedResults") {
+            do {
+                // UserDefaultsからデータをデコードし、Prefecture型の配列として返す
+                return try JSONDecoder().decode([Prefecture].self, from: savedData)
+            } catch {
+                // エラーが発生した場合は、コンソールにエラーメッセージを出力
+                print("Decoding error: \(error)")
+            }
+        }
+        // エラーが発生した場合やデータが存在しない場合は空の配列を返す
+        return []
     }
 
     enum ViewType {
@@ -71,6 +86,8 @@ struct ContentView: View {
 
 struct HomeView: View {
     @Binding var currentView: ContentView.ViewType
+    let loadSavedResults: () -> [Prefecture]
+    @State private var savedResults: [Prefecture] = []
 
     var body: some View {
         VStack {
@@ -82,6 +99,19 @@ struct HomeView: View {
                 .font(.headline)
                 .padding()
 
+            ScrollView {
+                ForEach(savedResults, id: \.name) { prefecture in
+                    ResultCardView(prefectureData: prefecture)
+                        .onTapGesture {
+                            // Implement navigation to detailed result view if needed
+                        }
+                }
+            }
+            .padding()
+            .onAppear {
+                savedResults = loadSavedResults()
+            }
+
             Button(action: { currentView = .input }) {
                 Text("占いを始める")
             }
@@ -89,6 +119,7 @@ struct HomeView: View {
         }
         .padding()
     }
+
 }
 
 struct InputView: View {
@@ -190,6 +221,7 @@ struct ResultView: View {
                 Button("結果を保存") {
                     if let data = prefectureData {
                         parent.saveResultToUserDefaults(prefectureData: data)
+                        currentView = .home
                     }
                 }
                 .buttonStyle(PrimaryButtonStyle())

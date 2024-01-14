@@ -63,6 +63,20 @@ struct ContentView: View {
             UserDefaults.standard.set(encodedData, forKey: "savedResults")
         }
     }
+    
+    private func loadSavedResults() -> [Prefecture] {
+        if let savedData = UserDefaults.standard.data(forKey: "savedResults") {
+            do {
+                // UserDefaultsからデータをデコードし、Prefecture型の配列として返す
+                return try JSONDecoder().decode([Prefecture].self, from: savedData)
+            } catch {
+                // エラーが発生した場合は、コンソールにエラーメッセージを出力
+                print("Decoding error: \(error)")
+            }
+        }
+        // エラーが発生した場合やデータが存在しない場合は空の配列を返す
+        return []
+    }
 
     private func loadSavedResults() -> [Prefecture] {
         if let savedData = UserDefaults.standard.data(forKey: "savedResults") {

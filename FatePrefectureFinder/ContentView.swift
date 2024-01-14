@@ -98,6 +98,16 @@ struct HomeView: View {
                 .font(.headline)
                 .padding()
 
+            if savedResults.isEmpty {
+                Text("占い結果を追加しましょう！") // "Let's add your fortune-telling results!"
+                    .font(.headline)
+                    .padding()
+            } else {
+                Text("過去の占い結果") // "Past fortune-telling results"
+                    .font(.headline)
+                    .padding()
+            }
+            
             ScrollView {
                 ForEach(savedResults, id: \.name) { prefecture in
                     ResultCardView(prefectureData: prefecture)
